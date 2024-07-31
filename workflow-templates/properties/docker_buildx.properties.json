@@ -1,0 +1,6 @@
+{
+    "name": "Docker BuildX Starter Workflow",
+    "description": "Starter Workflow for building docker images",
+    "categories": ["Continuous integration", "Docker", "automation"],
+    "creator": "Przemyslaw Gorzynski"
+}

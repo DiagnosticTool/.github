@@ -1,0 +1,44 @@
+name: Docker BuildX
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Matches tags in the format v1.0.0, v2.1.0, etc.
+  workflow_dispatch:
+
+env:
+  AUTOMATION_ACCOUNT: gh-automation-account
+  AUTOMATION_ACCOUNT_PAT: ${{ secrets.AUTOMATION_ACCOUNT_TOKEN }}
+  DOCKER_REGISTRY: ghcr.io
+  IMAGE_PUSH: true
+  IMAGE_PLATFORMS: linux/amd64,linux/arm64/v8
+  DOCKERFILE: "."
+
+jobs:
+  Docker_BuildX:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set env vars
+      uses: DiagnosticTool/.github/actions/set_env_vars@main
+
+    - name: Login to GitHub Container Registry
+      uses: DiagnosticTool/.github/actions/docker_registry_auth@main
+      with:
+        registry: ${{ env.DOCKER_REGISTRY }}
+        username: ${{ env.AUTOMATION_ACCOUNT }}
+        password: ${{ env.AUTOMATION_ACCOUNT_PAT }}
+
+    - name: Build and push Docker image
+      uses: DiagnosticTool/.github/actions/docker_buildx@main
+      with:
+        docker_registry: ${{ env.DOCKER_REGISTRY }}
+        repo_owner: ${{ env.REPO_OWNER }}
+        repo_name: ${{ env.REPO_NAME }}
+        tag: ${{ env.TAG }}
+        push: ${{ env.IMAGE_PUSH }}
+        platforms: ${{ env.IMAGE_PLATFORMS }}
+        context: ${{ env.DOCKERFILE }}
