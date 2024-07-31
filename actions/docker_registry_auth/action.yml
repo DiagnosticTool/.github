@@ -1,0 +1,21 @@
+name: 'Login to Container Registry'
+description: 'Logs in to a container registry using provided credentials'
+inputs:
+  registry:
+    description: 'The container registry URL'
+    required: true
+    default: 'ghcr.io'
+  username:
+    description: 'Username for the container registry'
+    required: true
+  password:
+    description: 'Password or token for the container registry'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Log in to Docker registry
+      shell: sh
+      run: |
+        echo "${{ inputs.password }}" | docker login ${{ inputs.registry }} -u "${{ inputs.username }}" --password-stdin

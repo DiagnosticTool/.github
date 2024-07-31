@@ -1,0 +1,51 @@
+name: "Build push docker image"
+description: "Build and push docker image"
+inputs:
+  docker_registry:
+    description: "Docker registry"
+    required: true
+  repo_owner:
+    description: "Repo owner"
+    required: true
+  repo_name:
+    description: "Repo name. Equal to package name"
+    required: true
+  tag:
+    description: "Image tag"
+    required: true
+  context:
+    description: "The build context for the Docker image."
+    required: true
+  platforms:
+    description: "The platforms to build for, e.g., linux/amd64,linux/arm64."
+    required: true
+  push:
+    description: "Whether to push the Docker image."
+    required: false
+    default: "false"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Docker Buildx
+      shell: bash
+      run: |
+
+        # Create a new buildx builder instance
+        docker buildx create --name mybuilder --use
+
+    - name: Build and optionally push Docker image
+      shell: bash
+      run: |
+
+        # Determine if we should push the image
+        PUSH_FLAG=""
+        if [ "${{ inputs.push }}" == "true" ]; then
+          PUSH_FLAG="--push"
+        fi
+
+        # Build and push the Docker image
+        docker buildx build --platform="${{ inputs.platforms }}" \
+        -t "${{ inputs.docker_registry }}/${{ inputs.repo_owner }}/${{ inputs.repo_name }}:latest" \
+        -t "${{ inputs.docker_registry }}/${{ inputs.repo_owner }}/${{ inputs.repo_name }}:${{ inputs.tag }}" \
+        $PUSH_FLAG ${{ inputs.context }}
