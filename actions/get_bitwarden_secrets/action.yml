@@ -1,0 +1,24 @@
+name: 'Get bitwarden Secrets'
+description: 'Get bitwarden Secrets'
+inputs:
+  bw_access_token:
+    description: "Bitwarden Access Token"
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Get BW Secrets
+      uses: bitwarden/sm-action@v2
+      with:
+        access_token: ${{ inputs.bw_access_token }}
+        base_url: https://vault.bitwarden.com
+        secrets: |
+          09fe1647-c5c9-4246-bdd8-b1c400be5e84 > TF_VAR_API_CONNECTION_STRING
+          d4f17f43-516a-4b0c-936a-b1c400be8bd4 > TF_VAR_MONGODB_CONNECTION_STRING
+          c60b1e53-e5cb-4fe2-8665-b1c400bea310 > TF_VAR_MONGODB_HOSTNAME
+          bb454821-d4ea-4e90-9e40-b1c400bebbd4 > TF_VAR_MONGODB_USERNAME
+          d7404988-caf9-4e0c-ae01-b1c400beb077 > TF_VAR_MONGODB_PASSWORD
+          2530628f-a158-46e9-ab5f-b1c400be7d9d > TF_VAR_GITHUB_CR_USERNAME
+          427b44e3-a4c0-41e2-b1bb-b1c400be6cf9 > TF_VAR_GITHUB_CR_TOKEN
+          7dfd56fe-013c-4e49-b06c-b1c400bec9b7 > SLACK_NOTIFICATION_BOT_TOKEN
