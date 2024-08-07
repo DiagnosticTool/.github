@@ -1,0 +1,139 @@
+name: 'Send Slack Notofication'
+description: 'Send Slack Notofication'
+inputs:
+  slack_bot_token:
+    description: "Bitwarden Access Token"
+    required: true
+  channel_id:
+    description: "Bitwarden Access Token"
+    required: true
+  state:
+    description: "Bitwarden Access Token"
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Send Slack Notification - Success
+      if: ${{ inputs.state == 'success' }}
+      uses: slackapi/slack-github-action@v1.26.0
+      with:
+        channel-id: ${{ inputs.channel_id }}
+        payload: |
+          {
+            "text": "GitHub Action build result.",
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": ":success: ${{ github.workflow }}  -  Succeded",
+                  "emoji": true
+                }
+              },
+              {
+                "type": "divider"
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Type:*\n${{ github.event_name }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Created by:*\n${{ github.actor }}"
+                  }
+                ]
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Repo:*\n${{ github.repository }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Branch:*\n${{ github.ref_name }}"
+                  }
+                ]
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*URL:*\n<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|WF_Link>"
+                  }
+                ]
+              }
+
+            ]
+          }
+      env:
+        SLACK_BOT_TOKEN: ${{ inputs.slack_bot_token }}
+    - name: Send Slack Notofication - Fail
+      if: ${{ inputs.state == 'failure' }}
+      uses: slackapi/slack-github-action@v1.26.0
+      with:
+        channel-id: ${{ inputs.channel_id }}
+        payload: |
+          {
+            "text": "GitHub Action build result.",
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": ":failed: ${{ github.workflow }}  -  Failed",
+                  "emoji": true
+                }
+              },
+              {
+                "type": "divider"
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Type:*\n${{ github.event_name }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Created by:*\n${{ github.actor }}"
+                  }
+                ]
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Repo:*\n${{ github.repository }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Branch:*\n${{ github.ref_name }}"
+                  }
+                ]
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Job:*\n${{ github.job }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*URL:*\n<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|WF_Link>"
+                  }
+                ]
+              }
+            ]
+          }
+      env:
+        SLACK_BOT_TOKEN: ${{ inputs.slack_bot_token }}
