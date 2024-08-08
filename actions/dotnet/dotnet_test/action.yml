@@ -1,0 +1,20 @@
+name: 'Dotnet test'
+description: 'Dotnet test'
+inputs:
+  project_name:
+    description: "Project Name"
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Dotnet test
+      shell: sh
+      run: |
+        dotnet test --logger trx --results-directory "TestResults-${{ inputs.project_name }}"
+    - name: Upload dotnet test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: dotnet-results-${{ inputs.project_name }}"
+        path: TestResults-${{ inputs.project_name }}"
+      if: ${{ always() }}

@@ -1,0 +1,14 @@
+name: 'Dotnet build'
+description: 'Dotnet build'
+inputs:
+  project_name:
+    description: "Project Name"
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Dotnet Build
+      shell: sh
+      run: |
+        dotnet build --configuration Release ${{ inputs.project_name }}
