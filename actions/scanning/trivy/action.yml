@@ -4,7 +4,10 @@ inputs:
   scan_type:
     description: "Scan Type"
     required: true
-  image:
+  env:
+    description: "Env Type"
+    required: false
+  docker_image:
     description: "Docker image"
     required: false
   working_directory:
@@ -14,21 +17,22 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Install Trivy
-      if: always() 
-      shell: sh
-      run: |
-        curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
-    - name: Run Trivy FS scan
-      working-directory: ${{ inputs.working_directory }}
-      shell: sh
-      if: ${{ inputs.scan_type == 'fs' }}
-      run: |
-        ../bin/trivy fs --exit-code 0 --severity LOW,MEDIUM --ignore-unfixed .
-        ../bin/trivy fs --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed .
-    - name: Run Trivy Docker scan
-      shell: sh
+    - name: Run Trivy vulnerability scanner in IaC mode
+      if: ${{ inputs.scan_type == 'config' }}
+      uses: aquasecurity/trivy-action@0.20.0
+      with:
+        scan-type: 'config'
+        hide-progress: false
+        format: 'table'
+        exit-code: '0'
+        severity: 'CRITICAL,HIGH'
+        tf-vars: ${{ inputs.working_directory }}/${{ inputs.env }}.tfvars
+        scan-ref: ${{ inputs.working_directory }}
+    - name: Run Trivy vulnerability scanner
       if: ${{ inputs.scan_type == 'image' }}
-      run: |
-        ../bin/trivy image --exit-code 0 --severity LOW,MEDIUM ${{ inputs.image }}
-        ../bin/trivy image --exit-code 1 --severity HIGH,CRITICAL ${{ inputs.image }}
+      uses: aquasecurity/trivy-action@0.20.0
+      with:
+        image-ref: ${{ inputs.docker_image }}
+        format: 'table'
+        exit-code: '0'
+        severity: 'CRITICAL,HIGH'
