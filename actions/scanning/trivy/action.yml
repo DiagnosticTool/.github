@@ -1,0 +1,34 @@
+name: 'Send Slack Notofication'
+description: 'Send Slack Notofication'
+inputs:
+  scan_type:
+    description: "Scan Type"
+    required: true
+  image:
+    description: "Docker image"
+    required: false
+  working_directory:
+    description: "Code directory"
+    required: false
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Trivy
+      if: always() 
+      shell: sh
+      run: |
+        curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+    - name: Run Trivy FS scan
+      working-directory: ${{ inputs.working_directory }}
+      shell: sh
+      if: ${{ inputs.scan_type == 'fs' }}
+      run: |
+        ../bin/trivy fs --exit-code 0 --severity LOW,MEDIUM --ignore-unfixed .
+        ../bin/trivy fs --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed .
+    - name: Run Trivy Docker scan
+      shell: sh
+      if: ${{ inputs.scan_type == 'image' }}
+      run: |
+        ../bin/trivy image --exit-code 0 --severity LOW,MEDIUM ${{ inputs.image }}
+        ../bin/trivy image --exit-code 1 --severity HIGH,CRITICAL ${{ inputs.image }}
