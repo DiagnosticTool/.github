@@ -1,9 +1,25 @@
 name: 'Dotnet build'
 description: 'Dotnet build'
 inputs:
+  dotnet_version:
+    description: "Configuration"
+    required: true
+  configuration:
+    description: "Configuration"
+    required: true
+  project_path:
+    description: "Project Path"
+    required: true
   project_name:
     description: "Project Name"
     required: true
+  release:
+    description: "Release switch"
+    required: false
+  release_tag:
+    description: "Release tag"
+    default: 'release-tag-here'
+    required: false
 
 runs:
   using: 'composite'
@@ -11,4 +27,24 @@ runs:
     - name: Dotnet Build
       shell: sh
       run: |
-        dotnet build --configuration Release ${{ inputs.project_name }}
+        dotnet build --configuration ${{ inputs.configuration }} --output output/${{ inputs.project_name }} ${{ inputs.project_path }}
+
+    - name: Create zip file
+      if: ${{ inputs.release == 'true' }}
+      shell: sh
+      run: |
+        # Make sure there are files in the directory before zipping
+        if [ -d "output/${{ inputs.project_name }}" ] && [ "$(ls -A output/${{ inputs.project_name }})" ]; then
+          cd output && zip -r ${{ inputs.project_name }}-${{ inputs.release_tag }}.zip ${{ inputs.project_name }}
+        else
+          echo "No files found in the directory to zip."
+          exit 1
+        fi
+
+    - name: Upload Artifact - ZIP file
+      if: ${{ inputs.release == 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.project_name }}-${{ inputs.release_tag }}
+        path: output/${{ inputs.project_name }}-${{ inputs.release_tag }}.zip
+        retention-days: 5

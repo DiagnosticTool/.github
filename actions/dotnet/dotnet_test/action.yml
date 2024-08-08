@@ -1,8 +1,14 @@
 name: 'Dotnet test'
 description: 'Dotnet test'
 inputs:
+  project_path:
+    description: "Project Name"
+    required: true
   project_name:
     description: "Project Name"
+    required: true
+  logger:
+    description: "logger_type"
     required: true
 
 runs:
@@ -11,10 +17,11 @@ runs:
     - name: Dotnet test
       shell: sh
       run: |
-        dotnet test --logger trx --results-directory "TestResults-${{ inputs.project_name }}"
+        dotnet test ${{ inputs.project_path }} --logger ${{ inputs.logger }} --results-directory "TestResults-${{ inputs.project_name }}"
     - name: Upload dotnet test results
       uses: actions/upload-artifact@v4
       with:
-        name: dotnet-results-${{ inputs.project_name }}"
+        name: TestResults-${{ inputs.project_name }}"
         path: TestResults-${{ inputs.project_name }}"
+        retention-days: 5
       if: ${{ always() }}
