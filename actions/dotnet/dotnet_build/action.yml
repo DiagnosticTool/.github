@@ -27,24 +27,25 @@ runs:
     - name: Dotnet Build
       shell: sh
       run: |
-        dotnet build --configuration ${{ inputs.configuration }} --output output/${{ inputs.project_name }} ${{ inputs.project_path }}
+        dotnet build --configuration ${{ inputs.configuration }} --output ${{ inputs.project_name }}-${{ inputs.release_tag }} ${{ inputs.project_path }}
 
-    - name: Create zip file
-      if: ${{ inputs.release == 'true' }}
-      shell: sh
-      run: |
-        # Make sure there are files in the directory before zipping
-        if [ -d "output/${{ inputs.project_name }}" ] && [ "$(ls -A output/${{ inputs.project_name }})" ]; then
-          cd output && zip -r ${{ inputs.project_name }}-${{ inputs.release_tag }}.zip ${{ inputs.project_name }}
-        else
-          echo "No files found in the directory to zip."
-          exit 1
-        fi
+    # - name: Create zip file
+    #   if: ${{ inputs.release == 'true' }}
+    #   shell: sh
+    #   run: |
+    #     # Make sure there are files in the directory before zipping
+    #     if [ -d "${{ inputs.project_name }}-${{ inputs.release_tag }}" ] && [ "$(ls -A ${{ inputs.project_name }}-${{ inputs.release_tag }})" ]; then
+    #       zip -r ${{ inputs.project_name }}-${{ inputs.release_tag }}.zip ${{ inputs.project_name }}-${{ inputs.release_tag }}/
+    #     else
+    #       echo "No files found in the directory to zip."
+    #       exit 1
+    #     fi
 
     - name: Upload Artifact - ZIP file
       if: ${{ inputs.release == 'true' }}
       uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.project_name }}-${{ inputs.release_tag }}
-        path: output/${{ inputs.project_name }}-${{ inputs.release_tag }}.zip
+        path: ${{ inputs.project_name }}-${{ inputs.release_tag }}
         retention-days: 5
+        compression-level: 9
