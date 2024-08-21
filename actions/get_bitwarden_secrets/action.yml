@@ -14,7 +14,11 @@ runs:
         access_token: ${{ inputs.bw_access_token }}
         base_url: https://vault.bitwarden.com
         secrets: |
-          09fe1647-c5c9-4246-bdd8-b1c400be5e84 > TF_VAR_API_CONNECTION_STRING
+          74fd0d1f-abf4-44ad-bd3b-b1cb015fd30f > AZURE_CREDENTIALS_JSON
+          5193784e-9373-428b-b440-b1d300ad4a00 > ARM_CLIENT_ID
+          5dedc3e3-8eb8-40f6-b32f-b1d300ad6061 > ARM_CLIENT_SECRET
+          698057ea-2302-45d4-b469-b1d300ad85df > ARM_SUBSCRIPTION_ID
+          604f1d36-1d7d-4473-87eb-b1d300ad9d63 > ARM_TENANT_ID
           d4f17f43-516a-4b0c-936a-b1c400be8bd4 > TF_VAR_MONGODB_CONNECTION_STRING
           c60b1e53-e5cb-4fe2-8665-b1c400bea310 > TF_VAR_MONGODB_HOSTNAME
           bb454821-d4ea-4e90-9e40-b1c400bebbd4 > TF_VAR_MONGODB_USERNAME
