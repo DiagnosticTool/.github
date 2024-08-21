@@ -14,7 +14,6 @@ runs:
         access_token: ${{ inputs.bw_access_token }}
         base_url: https://vault.bitwarden.com
         secrets: |
-          d842fa12-77b6-4897-9b44-b1d300b77356 > AUTOMATION_ACCOUNT_GITHUB_TOKEN
           74fd0d1f-abf4-44ad-bd3b-b1cb015fd30f > AZURE_CREDENTIALS_JSON
           5193784e-9373-428b-b440-b1d300ad4a00 > ARM_CLIENT_ID
           5dedc3e3-8eb8-40f6-b32f-b1d300ad6061 > ARM_CLIENT_SECRET
