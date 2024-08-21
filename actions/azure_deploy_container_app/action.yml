@@ -1,0 +1,20 @@
+name: 'Deploy Container to Azure Container APP'
+description: 'Deploy Container to Azure Container APP'
+inputs:
+  capp_name:
+    description: "Container APP name"
+    required: true
+  resource_group:
+    description: "RG name"
+    required: true
+  docker_image:
+    description: "Docker Image"
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Deploy Container to Azure Container APP
+      shell: sh
+      run: |
+        az containerapp update -n ${{ inputs.capp_name }} -g ${{ inputs.resource_group }} --image ${{ inputs.docker_image }}
