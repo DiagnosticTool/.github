@@ -4,35 +4,22 @@ inputs:
   scan_type:
     description: "Scan Type"
     required: true
-  env:
-    description: "Env Type"
-    required: false
   docker_image:
     description: "Docker image"
     required: false
-  working_directory:
-    description: "Code directory"
-    required: false
+
 
 runs:
   using: 'composite'
   steps:
-    - name: Run Trivy vulnerability scanner in IaC mode
-      if: ${{ inputs.scan_type == 'config' }}
-      uses: aquasecurity/trivy-action@0.20.0
-      with:
-        scan-type: 'config'
-        hide-progress: false
-        format: 'table'
-        exit-code: '0'
-        severity: 'CRITICAL,HIGH'
-        tf-vars: ${{ inputs.working_directory }}/${{ inputs.env }}.tfvars
-        scan-ref: ${{ inputs.working_directory }}
     - name: Run Trivy vulnerability scanner
       if: ${{ inputs.scan_type == 'image' }}
-      uses: aquasecurity/trivy-action@0.20.0
+      shell: bash
+      run: docker run --rm -v ${{ github.workspace }}:/output aquasec/trivy:0.54.1 image --scanners vuln,secret --format cyclonedx --output /output/trivy_dt_api ${{ inputs.docker_image }}
+    - name: Upload Artifact - Scan result
+      uses: actions/upload-artifact@v4
       with:
-        image-ref: ${{ inputs.docker_image }}
-        format: 'table'
-        exit-code: '0'
-        severity: 'CRITICAL,HIGH'
+        name: trivy_dt_api
+        path: /${{ github.workspace }}/trivy_dt_api
+        retention-days: 5
+        compression-level: 9
